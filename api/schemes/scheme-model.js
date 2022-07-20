@@ -1,23 +1,31 @@
+const db = require('../../data/db-config')
+
 function find() { // EXERCISE A
-  /*
-    1A- Study the SQL query below running it in SQLite Studio against `data/schemes.db3`.
-    What happens if we change from a LEFT join to an INNER join?
+  return db('schemes')
+    .leftJoin('steps', 'schemes.scheme_id', 'steps.scheme_id' )
+    .groupBy('schemes.scheme_id')
+    .select('scheme_name', 'schemes.scheme_id')
+    .count('steps.scheme_id as number_of_steps')
 
-      SELECT
-          sc.*,
-          count(st.step_id) as number_of_steps
-      FROM schemes as sc
-      LEFT JOIN steps as st
-          ON sc.scheme_id = st.scheme_id
-      GROUP BY sc.scheme_id
-      ORDER BY sc.scheme_id ASC;
-
-    2A- When you have a grasp on the query go ahead and build it in Knex.
-    Return from this function the resulting dataset.
-  */
 }
 
-function findById(scheme_id) { // EXERCISE B
+async function findById(id) { // EXERCISE B
+  const array = await db('schemes')
+    .leftJoin('steps', 'schemes.scheme_id', 'steps.scheme_id' )
+    .where('schemes.scheme_id', id)
+    .select('instructions', 'step_number', 'step_id', 'scheme_name', 'schemes.scheme_id')
+    .orderBy('step_number', 'asc')
+
+  const { scheme_name, scheme_id } = array[0]
+  const result = {
+    scheme_name,
+    scheme_id,
+    steps: array
+      .filter(item => item.step_id != null)
+      .map(item => ({ instructions: item.instructions, step_number: item.step_number, step_id: item.step_id }))
+  }
+
+  return result
   /*
     1B- Study the SQL query below running it in SQLite Studio against `data/schemes.db3`:
 
@@ -86,6 +94,11 @@ function findById(scheme_id) { // EXERCISE B
 }
 
 function findSteps(scheme_id) { // EXERCISE C
+  return db('steps')
+    .join('schemes', 'steps.scheme_id', 'schemes.scheme_id' )
+    .where('steps.scheme_id', scheme_id)
+    .select('step_id', 'step_number', 'instructions', 'schemes.scheme_name' )
+    .orderBy('step_number', 'asc')
   /*
     1C- Build a query in Knex that returns the following data.
     The steps should be sorted by step_number, and the array
@@ -112,6 +125,9 @@ function add(scheme) { // EXERCISE D
   /*
     1D- This function creates a new scheme and resolves to _the newly created scheme_.
   */
+ return db('schemes')
+  .insert(scheme)
+  .then(id => findById(id[0]))
 }
 
 function addStep(scheme_id, step) { // EXERCISE E
