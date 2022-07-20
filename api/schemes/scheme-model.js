@@ -136,6 +136,19 @@ function addStep(scheme_id, step) { // EXERCISE E
     and resolves to _all the steps_ belonging to the given `scheme_id`,
     including the newly created one.
   */
+ const { instructions, step_number } = step
+
+ return db('steps')
+  .insert({
+    instructions,
+    step_number,
+    scheme_id,
+  })
+  //Another way {...step, scheme_id}
+  .then(() => findSteps(scheme_id))
+  
+
+
 }
 
 module.exports = {
