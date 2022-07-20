@@ -139,12 +139,12 @@ function addStep(scheme_id, step) { // EXERCISE E
  const { instructions, step_number } = step
 
  return db('steps')
-  .insert({
-    instructions,
-    step_number,
-    scheme_id,
-  })
-  //Another way {...step, scheme_id}
+  // .insert({
+  //   instructions,
+  //   step_number,
+  //   scheme_id,
+  // })
+  .insert({...step, scheme_id})
   .then(() => findSteps(scheme_id))
   
 
