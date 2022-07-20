@@ -43,6 +43,15 @@ const validateScheme = (req, res, next) => {
   }
 */
 const validateStep = (req, res, next) => {
+  const { instructions, step_number } = req.body;
+  if(instructions == null || instructions.trim() === ""){
+    res.status(400).json({ message: 'invalid step'})
+    return;
+  }
+  if(typeof step_number !== 'number' || step_number < 0){
+    res.status(400).json({ message: 'invalid step'})
+    return;
+  }
   next()
 }
 
